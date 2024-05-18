@@ -28,14 +28,14 @@ class HomeViewModel(private val mongoDB: MongoDB): ScreenModel {
         _activeTasks.value = RequestState.Loading
         _completedTasks.value = RequestState.Loading
 
-        screenModelScope.launch(Dispatchers.Main) {
+        screenModelScope.launch(Dispatchers.IO) {
             delay(500)
             mongoDB.readPendingTasks().collectLatest {
                 _activeTasks.value = it
             }
         }
 
-        screenModelScope.launch(Dispatchers.Main) {
+        screenModelScope.launch(Dispatchers.IO) {
             delay(500)
             mongoDB.readCompletedTasks().collectLatest {
                 _completedTasks.value = it

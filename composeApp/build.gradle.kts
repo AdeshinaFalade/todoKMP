@@ -16,6 +16,8 @@ kotlin {
         }
     }
     task("testClasses")
+
+    jvm("desktop")
     
     listOf(
         iosX64(),
@@ -30,10 +32,13 @@ kotlin {
     }
     
     sourceSets {
-        
+        val desktopMain by getting
+
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+//            implementation(libs.kotlin.coroutines.android)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -52,6 +57,12 @@ kotlin {
             implementation(libs.stately.common)
             implementation(libs.kotlin.coroutines)
 
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+
+//            implementation(libs.kotlin.coroutines.android)
         }
     }
 }
@@ -89,4 +100,17 @@ android {
         debugImplementation(libs.compose.ui.tooling)
     }
 }
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "com.shredder.todo"
+            packageVersion = "1.0.0"
+        }
+    }
+}
+
 

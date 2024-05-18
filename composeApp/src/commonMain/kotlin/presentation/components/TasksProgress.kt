@@ -1,5 +1,12 @@
 package presentation.components
 
+import androidx.compose.animation.core.EaseInBounce
+import androidx.compose.animation.core.EaseOutBounce
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -48,6 +56,10 @@ fun TasksProgress(
                 fontWeight = MaterialTheme.typography.titleLarge.fontWeight
             )
             val total = if(pendingTasks + completedTasks > 0) (pendingTasks + completedTasks).toFloat() else 1f
+            val progress by animateFloatAsState(
+                targetValue = completedTasks / total,
+                animationSpec = tween(durationMillis = 600, easing =  EaseOutBounce)
+            )
             Box(
                 modifier = Modifier
                     .size(60.dp),
@@ -57,9 +69,9 @@ fun TasksProgress(
                     modifier = Modifier
                         .fillMaxSize(),
                     progress = {
-                        completedTasks / total
+                        progress
                     },
-                    strokeCap = StrokeCap.Butt,
+                    strokeCap = StrokeCap.Round,
                     strokeWidth = 8.dp,
                     color = MaterialTheme.colorScheme.primary,
                     trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f)
