@@ -1,5 +1,6 @@
 package presentation.screen.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import domain.TodoTask
 import presentation.components.ErrorScreen
 import presentation.components.LoadingScreen
 import presentation.components.TaskView
+import presentation.components.TasksProgress
 import presentation.screen.task.TaskScreen
 
 class HomeScreen : Screen {
@@ -63,10 +65,16 @@ class HomeScreen : Screen {
         }) { padding ->
             Column(
                 modifier = Modifier.fillMaxSize().padding(top = 24.dp).padding(
-                        top = padding.calculateTopPadding(),
-                        bottom = padding.calculateBottomPadding()
-                    )
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding()
+                )
             ) {
+                TasksProgress(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    completedTasks = completedTasks.getSuccessDataOrNull()?.size ?: 0,
+                    pendingTasks = pendingTasks.getSuccessDataOrNull()?.size ?: 0
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 DisplayTasks(modifier = Modifier.weight(1f),
                     tasks = pendingTasks,
                     onSelect = { selectedTask -> navigator.push(TaskScreen(selectedTask)) },
@@ -76,7 +84,7 @@ class HomeScreen : Screen {
                     onComplete = { task, completed ->
                         viewModel.setAction(TaskAction.SetCompleted(task, completed))
                     })
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 DisplayTasks(modifier = Modifier.weight(1f),
                     tasks = completedTasks,
                     showActive = false,
@@ -86,6 +94,7 @@ class HomeScreen : Screen {
                     onDelete = { task ->
                         viewModel.setAction(TaskAction.Delete(task))
                     })
+                Spacer(modifier = Modifier.height(20.dp))
             }
         }
     }
@@ -139,16 +148,20 @@ fun DisplayTasks(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = if (showActive) "Pending Tasks" else "Completed Tasks",
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = 24.dp),
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(12.dp))
         tasks.DisplayResult(onLoading = { LoadingScreen() },
             onError = { ErrorScreen(message = it) },
             onSuccess = { todoTasks ->
                 if (todoTasks.isNotEmpty()) {
-                    LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         items(items = todoTasks, key = { task -> task._id.toHexString() }) { task ->
                             TaskView(showActive = showActive,
                                 task = task,

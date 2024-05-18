@@ -16,6 +16,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -46,27 +50,41 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel = getScreenModel<TaskViewModel>()
-//        val keyboard = LocalSoftwareKeyboardController.current
+        val keyboard = LocalSoftwareKeyboardController.current
 
         var currentTitle by remember {
-            mutableStateOf(task?.title ?: DEFAULT_TITLE)
+            mutableStateOf(task?.title ?: "")
         }
         var currentDescription by remember {
-            mutableStateOf(task?.description ?: DEFAULT_DESCRIPTION)
+            mutableStateOf(task?.description ?: "")
         }
 
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
-                        BasicTextField(
+                        TextField(
                             textStyle = TextStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = MaterialTheme.typography.titleLarge.fontSize
                             ),
                             singleLine = true,
                             value = currentTitle,
-                            onValueChange = { currentTitle = it }
+                            onValueChange = { currentTitle = it },
+                            placeholder = {
+                                Text(
+                                    text = DEFAULT_TITLE,
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize
+                                )
+                            },
+                            colors = TextFieldDefaults.colors(
+                                focusedIndicatorColor = Color.Transparent,
+                                focusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            )
                         )
                     },
                     navigationIcon = {
@@ -80,8 +98,7 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
                 )
             },
             floatingActionButton = {
-                if (currentTitle.isNotEmpty() && currentDescription.isNotEmpty()
-                    && currentTitle != DEFAULT_TITLE && currentDescription != DEFAULT_DESCRIPTION) {
+                if (currentTitle.isNotBlank()) {
                     FloatingActionButton(
                         onClick = {
                             if (task != null) {
@@ -95,7 +112,7 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
                             } else {
                                 viewModel.setAction(TaskAction.Add(TodoTask().apply {
                                     title = currentTitle
-                                    description = currentDescription
+                                    description =  currentDescription
                                 }))
                             }
                             navigator.pop()
@@ -110,7 +127,7 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
                 }
             }
         ) { padding ->
-            BasicTextField(
+            TextField(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(24.dp)
@@ -124,10 +141,25 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
                 ),
                 value = currentDescription,
                 onValueChange = { description -> currentDescription = description },
-//                keyboardActions = KeyboardActions(onDone = {
-//                    keyboard?.hide()
-//                }),
-//                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                keyboardActions = KeyboardActions(onDone = {
+                    keyboard?.hide()
+                }),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                placeholder = {
+                    Text(
+                        text = DEFAULT_DESCRIPTION,
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                    )
+                }
+
 
 
             )

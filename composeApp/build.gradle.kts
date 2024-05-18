@@ -15,6 +15,7 @@ kotlin {
             }
         }
     }
+    task("testClasses")
     
     listOf(
         iosX64(),
@@ -24,6 +25,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "com.shred.todo")
         }
     }
     
